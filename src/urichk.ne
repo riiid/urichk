@@ -1,12 +1,26 @@
 @{%
     const moo = require('moo');
-    const lexer = moo.compile({
+    const commonTokenRules = {
         ln: { match: /\r?\n/, lineBreaks: true },
         ws: /[ \t]+/,
-        reserved: /[:/?#\[\]@]/,
-        permitted: /[!$&'()*+,;=]/,
         id: /(?:[a-zA-Z0-9\-._~]|%[0-9a-fA-F]{2})+/,
-        regex: /\/(?:(?![*+?])(?:[^\r\n\[/\\]|\\.|\[(?:[^\r\n\]\\]|\\.)*\])+)\/[gmi]?/
+        sc: /\/\/[^\r\n]*\r?\n/,
+        mc: /\/\*(?:\*(?!\/)|[^*])*\*\//,
+    };
+    const lexer = moo.states({
+        root: {
+            ...commonTokenRules,
+            lcb: { match: '{', push: 'block' },
+            reserved: /[:/?#\[\]@]/,
+            permitted: /[!$&'()*+,;=]/,
+        },
+        block: {
+            ...commonTokenRules,
+            lcb: { match: '{', push: 'block' },
+            rcb: { match: '}', pop: 1 },
+            symbol: /[?#:'=|\[\]]/,
+            regex: /\/(?:(?![*+?])(?:[^\r\n\[/\\]|\\.|\[(?:[^\r\n\]\\]|\\.)*\])+)\/[a-z]*/,
+        },
     });
 %}
 @lexer lexer

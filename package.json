@@ -4,6 +4,7 @@
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
+    "test": "yarn build && node lib/test.js",
     "build": "tsc && yarn build:nearley",
     "build:nearley": "nearleyc src/urichk.ne -o lib/urichk.js"
   },

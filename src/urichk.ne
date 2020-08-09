@@ -26,22 +26,27 @@
 @lexer lexer
 
 urichk -> (_ rule):* _ {% ([rules]) => rules.map(([, rule]) => rule) %}
-_ -> null | %ws | %ln
-# TODO: query, fragment checker
-rule -> uri {% id %}
-uri ->
-    scheme ":" ("/" "/"):? authority:? path:? ("?" query):? ("#" fragment):?
-    {% ([scheme, , , authority, path, query, fragment]) => ({
+_ -> (%ws | %ln | %sc | %mc):*
+
+rule -> head _ tail {% ([head, , tail]) => ({ head, tail }) %}
+
+head ->
+      scheme:? authority path:? {% parseHead %}
+    | scheme:? authority:? path {% parseHead %}
+@{%
+    const parseHead = ([scheme, authority, path]) => ({
         scheme,
         authority,
         path,
-        query,
-        fragment,
-    }) %}
-scheme -> %id {% id %}
+    });
+%}
+
+tail -> "{" (_ tail_rule):* _ "}" {% ([, rules]) => rules.map(([, rule]) => rule) %}
+
+scheme -> %id ":" {% id %}
 authority ->
-    (userinfo "@"):? host (":" port):?
-    {% ([userinfo, host, port]) => ({
+    ("/" "/"):? (userinfo "@"):? host (":" port):?
+    {% ([, userinfo, host, port]) => ({
         userinfo,
         host,
         port,
@@ -50,5 +55,14 @@ userinfo -> %id {% id %}
 host -> %id {% id %}
 port -> %id {% id %}
 path -> "/" %id {% ([, path]) => path %}
-query -> %id {% id %}
-fragment -> %id {% id %}
+
+tail_rule ->
+      tail_rule_match {% id %}
+    # | tail_rule_form {% id %}
+tail_rule_match ->
+    tail_rule_tail_type _ "match" _ (%id | %regex) {% ([tailType, , matchType, , pattern]) => ({
+        tailType,
+        matchType,
+        pattern,
+    }) %}
+tail_rule_tail_type -> ("?" | "#") (_ ":" %id):? {% id %}

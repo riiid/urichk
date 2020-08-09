@@ -2,8 +2,11 @@ import { lexer, parser } from '.';
 
 const fixture = `
 scheme:host {
-    ? match a
-    # match /b/
+    ? : label-test form {
+        a = 1
+        b = /2/
+        c[] = '3'
+    }
 }
 `;
 
@@ -41,4 +44,6 @@ for (const token of lexer) {
 }
 
 parser.feed(fixture);
-console.log(parser.finish()[0]);
+console.log(
+    JSON.stringify(parser.finish()[0], null, 4)
+);

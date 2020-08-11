@@ -55,7 +55,12 @@ authority ->
 userinfo -> %id {% id %}
 host -> %id {% id %}
 port -> %id {% id %}
-path -> "/" %id {% ([, path]) => path %}
+path ->
+      "/" {% () => [] %}
+    | ("/" path_fragment):+ "/":? {% ([fragments]) => fragments.map(([, fragment]) => fragment) %}
+path_fragment ->
+      %id {% ([name]) => ({ type: 'static', name }) %}
+    | "[" _ %id _ "]" {% ([, , name]) => ({ type: 'param', name }) %}
 
 tail_rule ->
       tail_rule_match {% id %}

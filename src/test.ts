@@ -1,7 +1,7 @@
 import { lexer, parser } from '.';
 
 const fixture = `
-scheme:host {
+scheme:host/foo/[bar]/baz/ {
     ? : label-test form {
         a = 1
         b = /2/

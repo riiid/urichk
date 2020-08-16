@@ -1,7 +1,7 @@
-import { lexer, parser } from '.';
+import { lexer, parse, compileSchema } from '.';
 
 const fixture = `
-scheme:host {
+scheme:example1.com/foo/bar/baz {
     ? match /web-path=(?<path>.*)/
     # match id-1
     # match id-2
@@ -11,7 +11,7 @@ scheme:host {
 /**
  * foo
  */
-scheme:host/path/[param1]/[param2] {
+scheme:example2.com/path/[param1]/[param2] {
     /**
      * bar
      */
@@ -25,15 +25,35 @@ scheme:host/path/[param1]/[param2] {
     }
     #:label-2 match /id/
 }
+
+scheme:username@example3.com:4321 {
+    ? form {
+        'a' = /.*/
+        'b' = /.*/
+        'c-d' = /.*/
+        '/' = /.*/
+        '?' = /.*/
+        'f/' = /.*/
+        'g' = /.*/
+        'h' = /.*/
+    }
+}
 `;
 
-lexer.reset(fixture);
-for (const token of lexer) {
-    const {type, text} = token;
-    console.log(`${type.padStart(10, ' ')}: ${JSON.stringify(text)}`);
-}
+// lexer.reset(fixture);
+// for (const token of lexer) {
+//     const {type, text} = token;
+//     console.log(`${type!.padStart(10, ' ')}: ${JSON.stringify(text)}`);
+// }
 
-parser.feed(fixture);
+const schema = parse(fixture)!;
+const code = compileSchema(schema);
+
+// console.log(
+//     JSON.stringify(schema, null, 4)
+// );
+console.log(code);
+const test = 'scheme://example2.com/path/param1/param2';
 console.log(
-    JSON.stringify(parser.finish()[0], null, 4)
+    eval('(()=>{'+code+';return chk("'+test+'")})()')
 );

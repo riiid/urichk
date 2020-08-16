@@ -5,6 +5,7 @@
         "lib": ["esnext"],
         "declaration": true,
         "rootDir": "src",
-        "outDir": "./lib"
+        "outDir": "./lib",
+        "strict": true
     }
 }

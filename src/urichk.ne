@@ -27,11 +27,19 @@
 %}
 @lexer lexer
 
-urichk -> (_ rule):* _ {% ([rules]) => rules.map(([, rule]) => rule) %}
-_ -> (%ws | %ln | %sc | %mc):*
+urichk -> rule:* _ {% id %}
+_ -> (%ws | %ln | %sc | %mc):* {%
+    ([tokens]) => {
+        let result = undefined;
+        for (const [token] of tokens) {
+            if (token.type === 'mc') result = token;
+        }
+        return result;
+    }
+%}
 ident => %id {% id %} | %num {% id %}
 
-rule -> head _ tail {% ([head, , tail]) => ({ head, tail }) %}
+rule -> _ head _ tail {% ([comment, head, , tail]) => ({ comment, head, tail }) %}
 
 head ->
       scheme authority path:? {% parseHead %}
@@ -44,7 +52,7 @@ head ->
     });
 %}
 
-tail -> "{" (_ tail_rule):* _ "}" {% ([, rules]) => rules.map(([, rule]) => rule) %}
+tail -> "{" (_ tail_rule):* _ "}" {% ([, rules]) => rules.map(([comment, rule]) => ({ ...rule, comment })) %}
 
 scheme -> ident ":" {% id %}
 authority ->

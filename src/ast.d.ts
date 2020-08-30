@@ -7,6 +7,7 @@ export interface Token<TText = string> {
     col: number;
 }
 export interface Rule {
+    comment?: Token;
     head: Head;
     tail: Tail;
 }
@@ -37,6 +38,7 @@ export interface ParamPathFragment {
 export type Tail = TailRule[];
 export type TailRule = TailRuleMatch | TailRuleForm;
 export interface TailRuleBase<TMatch extends Token> {
+    comment?: Token;
     tailType: { type: Token<'?' | '#'>, label: Token };
     matchType: TMatch;
 }

@@ -39,7 +39,7 @@ export type Tail = TailRule[];
 export type TailRule = TailRuleMatch | TailRuleForm;
 export interface TailRuleBase<TMatch extends Token> {
     comment?: Token;
-    tailType: { type: Token<'?' | '#'>, label: Token };
+    tailType: { type: Token<'?' | '#'>, label?: Token };
     matchType: TMatch;
 }
 export interface TailRuleMatch extends TailRuleBase<Token<'match'>> {

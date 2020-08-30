@@ -16,6 +16,9 @@ scheme:example2.com/path/[param1]/[param2] {
      * bar
      */
     ?:label-1 form {
+        /**
+         * baz
+         */
         '' = ''
         a
         b

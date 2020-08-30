@@ -49,6 +49,8 @@ export interface TailRuleForm extends TailRuleBase<Token<'form'>> {
     pattern: TailRuleFormPatternRule[];
 }
 export interface TailRuleFormPatternRule {
+    comment?: Token;
     key: { type: 'id' | 'string', value: Token };
     value: { type: 'id' | 'string' | 'regex', value: Token }[];
+    array: boolean;
 }

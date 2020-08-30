@@ -52,7 +52,7 @@ head ->
     });
 %}
 
-tail -> "{" (_ tail_rule):* _ "}" {% ([, rules]) => rules.map(([comment, rule]) => ({ ...rule, comment })) %}
+tail -> "{" (_ tail_rule):* _ "}" {% ([, rules]) => rules.map(([comment, rule]) => ({ comment, ...rule })) %}
 
 scheme -> ident ":" {% id %}
 authority ->
@@ -92,7 +92,7 @@ tail_rule_form ->
         matchType,
         pattern,
     }) %}
-tail_rule_form_pattern -> "{" (_ tail_rule_form_pattern_rule):* _ "}" {% ([, rules]) => rules.map(([, rule]) => rule) %}
+tail_rule_form_pattern -> "{" (_ tail_rule_form_pattern_rule):* _ "}" {% ([, rules]) => rules.map(([comment, rule]) => ({ comment, ...rule })) %}
 tail_rule_form_pattern_rule ->
       tail_rule_form_pattern_rule_key {% ([key]) => ({ key, value: null, array: false }) %}
     | tail_rule_form_pattern_rule_key _ "=" _ tail_rule_form_pattern_rule_value

@@ -1,4 +1,4 @@
-import type { Urichk, Key, TailRuleMatch, TailRuleForm, TailRulePatternValue } from '../ast';
+import type { Urichk, Key, TailRuleMatch, TailRuleForm, TailRulePatternValue, Token } from '../ast';
 
 export const defaultConfigForNode: CompileConfig = {
     importUrlAndUrlSearchParamsCode: `
@@ -10,6 +10,7 @@ export const defaultConfigForNode: CompileConfig = {
 export interface CompileConfig {
     importUrlAndUrlSearchParamsCode: string;
 }
+
 export function compile(schema: Urichk, config?: Partial<CompileConfig>): string {
     const {
         importUrlAndUrlSearchParamsCode = '',
@@ -18,6 +19,10 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
     const write = (code: string) => buffer.push(code);
     write(`
         ${importUrlAndUrlSearchParamsCode};
+        /**
+         * @param {string} uri
+         * @returns {CheckResult}
+         */
         function check(uri) {
             for (const chkRule of chkRules) {
                 const parsedUri = new URL(uri);
@@ -26,6 +31,25 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
             }
             return null;
         }
+        /**
+         * @typedef {Object} CheckResult
+         * @property {boolean} success
+         * @property {object} path
+         * @property {object|string|null} search
+         * @property {object|string|null} hash
+         * @property {Array.<CheckError>} errors
+         */
+        /**
+         * @typedef {Object} CheckError
+         * @property {Loc} loc
+         */
+        /**
+         * @typedef {Object} Loc
+         * @property {number} offset
+         * @property {number} lineBreaks
+         * @property {number} line
+         * @property {number} col
+         */
         const chkRules = [
     `);
     for (const rule of schema) {
@@ -34,7 +58,13 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
         comment && write(comment.text);
         write(`
             function chkRule(parsedUri) {
-                const result = {};
+                const result = {
+                    success: true,
+                    path: {},
+                    search: null,
+                    hash: null,
+                    errors: [],
+                };
         `);
         if (head.scheme) {
             write(`if (parsedUri.protocol.substr(0, parsedUri.protocol.length - 1) !== ${JSON.stringify(head.scheme.text)}) return null;\n`);
@@ -57,7 +87,7 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
                     write(`
                         const _${++_} = path.shift();
                         if (_${_} == null) return null;
-                        result[${JSON.stringify(pathFragment.name.text)}] = _${_};
+                        result.path[${JSON.stringify(pathFragment.name.text)}] = _${_};
                     `);
                 }
             }
@@ -70,18 +100,19 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
         }
         for (const {comment, tailType, matchType, pattern} of tail) {
             comment && write(comment.text);
-            const tailKey = tailType.text;
             write(`
                 {
                     const tail = ${ tailType.text === '?' ? 'search' : 'hash' };
-                    const tailKey = ${JSON.stringify(tailKey)};
+                    const tailKey = ${ tailType.text === '?' ? '"search"' : '"hash"' };
             `);
             if (matchType.text === 'match') {
                 write(`
                     if (${compileTailRulePattern('tail', pattern as Exclude<typeof pattern, TailRuleForm['pattern']>)}) {
                         result[tailKey] = tail;
                     } else {
-                        // TODO
+                        result.success = false;
+                        result.errors.push(${compileError(tailType)});
+                        return result;
                     }
                 `);
             } else if (matchType.text === 'form') {
@@ -99,7 +130,8 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
                             )) {
                                 formResult[${compileKeyToken(key)}] = values;
                             } else {
-                                // TODO
+                                result.success = false;
+                                result.errors.push(${compileError(key.value)});
                             }
                         }`);
                     } else {
@@ -109,7 +141,8 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
                                 if (${compileTailRulePattern('value', value)}) {
                                     formResult[${compileKeyToken(key)}] = value;
                                 } else {
-                                    // TODO
+                                    result.success = false;
+                                    result.errors.push(${compileError(key.value)});
                                 }
                             }`);
                         } else {
@@ -117,7 +150,8 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
                                 if (form.has(${compileKeyToken(key)})) {
                                     formResult[${compileKeyToken(key)}] = true;
                                 } else {
-                                    // TODO
+                                    result.success = false;
+                                    result.errors.push(${compileError(key.value)});
                                 }
                             }`);
                         }
@@ -125,6 +159,7 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
                 }
                 write(`
                     result[tailKey] = formResult;
+                    if (!result.success) return result;
                 `);
             }
             write(`
@@ -140,6 +175,16 @@ export function compile(schema: Urichk, config?: Partial<CompileConfig>): string
         ];
     `);
     return buffer.join('');
+}
+
+type Loc = Pick<Token, 'offset' | 'lineBreaks' | 'line' | 'col'>;
+
+function compileError(loc: Loc): string {
+    return `{loc: ${compileLoc(loc)}}`;
+}
+
+function compileLoc(loc: Loc): string {
+    return `{offset: ${loc.offset}, lineBreaks: ${loc.lineBreaks}, line: ${loc.line}, col: ${loc.col}}`;
 }
 
 function compileKeyToken(key: Key): string {

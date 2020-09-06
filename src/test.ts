@@ -25,8 +25,8 @@ scheme:example2.com/path/[param1]/[param2] {
         a
         b
         param1 = exact | match | value
-        param2 = /[0-9]+/
-        param3 [] = /[a-z]/i
+        param2 = /^[0-9]+$/
+        param3 [] = /^[a-z]+$/i
     }
     # match /id/
 }
@@ -58,7 +58,7 @@ const code = compile(schema, defaultConfigForNode);
 //     JSON.stringify(schema, null, 4)
 // );
 console.log(code);
-const test = 'scheme://example2.com/path/param1/param2?=&a&b&param1=exact&param2=123&param3=a&param3=a#id';
+const test = 'scheme://example2.com/path/param1/param2?=&a&b&param1=exact&param2=_123&param3=_a&param3=a#d';
 console.log(
     eval('(()=>{'+code+';return check("'+test+'")})()')
 );

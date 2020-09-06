@@ -1,10 +1,13 @@
 import { lexer, parse } from '.';
-import { compile } from './compile/js-url-checker';
+import { compile, defaultConfigForNode } from './compile/js-url-checker';
 
 const fixture = `
 scheme:example1.com/foo/bar/baz {
     ? match /web-path=(?<path>.*)/
-    # match id-1 | id-2 | /id-3/
+    # match
+        | id-1
+        | id-2
+        | /id-3/
 }
 
 /**
@@ -49,7 +52,7 @@ scheme:username@example3.com:4321 {
 // }
 
 const schema = parse(fixture)!;
-const code = compile(schema);
+const code = compile(schema, defaultConfigForNode);
 
 // console.log(
 //     JSON.stringify(schema, null, 4)
@@ -57,5 +60,5 @@ const code = compile(schema);
 console.log(code);
 const test = 'scheme://example2.com/path/param1/param2?=&a&b&param1=exact&param2=123&param3=a&param3=a#id';
 console.log(
-    eval('(()=>{'+code+';return chk("'+test+'")})()')
+    eval('(()=>{'+code+';return check("'+test+'")})()')
 );

@@ -1,12 +1,24 @@
 import type { Urichk, Key, TailRuleMatch, TailRuleForm, TailRulePatternValue } from '../ast';
 
-export function compile(schema: Urichk): string {
+export const defaultConfigForNode: CompileConfig = {
+    importUrlAndUrlSearchParamsCode: `
+        const URL = require('url').URL;
+        const URLSearchParams = require('url').URLSearchParams;
+    `,
+};
+
+export interface CompileConfig {
+    importUrlAndUrlSearchParamsCode: string;
+}
+export function compile(schema: Urichk, config?: Partial<CompileConfig>): string {
+    const {
+        importUrlAndUrlSearchParamsCode = '',
+    } = config ?? {};
     const buffer: string[] = [];
     const write = (code: string) => buffer.push(code);
     write(`
-        const URL = require('url').URL;
-        const URLSearchParams = require('url').URLSearchParams;
-        function chk(uri) {
+        ${importUrlAndUrlSearchParamsCode};
+        function check(uri) {
             for (const chkRule of chkRules) {
                 const parsedUri = new URL(uri);
                 const chkResult = chkRule(parsedUri);

@@ -1,4 +1,5 @@
-import { lexer, parse, compileSchema } from '.';
+import { lexer, parse } from '.';
+import { compile } from './compile/js-url-checker';
 
 const fixture = `
 scheme:example1.com/foo/bar/baz {
@@ -48,7 +49,7 @@ scheme:username@example3.com:4321 {
 // }
 
 const schema = parse(fixture)!;
-const code = compileSchema(schema);
+const code = compile(schema);
 
 // console.log(
 //     JSON.stringify(schema, null, 4)

@@ -3,9 +3,7 @@ import { lexer, parse, compileSchema } from '.';
 const fixture = `
 scheme:example1.com/foo/bar/baz {
     ? match /web-path=(?<path>.*)/
-    # match id-1
-    # match id-2
-    # match /id-3/
+    # match id-1 | id-2 | /id-3/
 }
 
 /**
@@ -15,7 +13,7 @@ scheme:example2.com/path/[param1]/[param2] {
     /**
      * bar
      */
-    ?:label-1 form {
+    ? form {
         /**
          * baz
          */
@@ -26,7 +24,7 @@ scheme:example2.com/path/[param1]/[param2] {
         param2 = /[0-9]+/
         param3 [] = /[a-z]/i
     }
-    #:label-2 match /id/
+    # match /id/
 }
 
 scheme:username@example3.com:4321 {
@@ -56,7 +54,7 @@ const code = compileSchema(schema);
 //     JSON.stringify(schema, null, 4)
 // );
 console.log(code);
-const test = 'scheme://example2.com/path/param1/param2';
+const test = 'scheme://example2.com/path/param1/param2?=&a&b&param1=exact&param2=123&param3=a&param3=a#id';
 console.log(
     eval('(()=>{'+code+';return chk("'+test+'")})()')
 );

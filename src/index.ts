@@ -1,7 +1,7 @@
 import * as nearley from 'nearley';
 import type { Lexer } from 'moo';
 import * as compiledRules from './urichk';
-import type { Urichk, TailRuleMatch, TailRuleForm } from './ast';
+import type { Urichk, Key, TailRuleMatch, TailRuleForm, TailRulePatternValue } from './ast';
 
 export const lexer = compiledRules.Lexer as Lexer;
 export const parser = new nearley.Parser(nearley.Grammar.fromCompiled(compiledRules));
@@ -15,6 +15,7 @@ export function compileSchema(schema: Urichk): string {
     const write = (code: string) => buffer.push(code);
     write(`
         const URL = require('url').URL;
+        const URLSearchParams = require('url').URLSearchParams;
         function chk(uri) {
             for (const chkRule of chkRules) {
                 const parsedUri = new URL(uri);
@@ -67,28 +68,62 @@ export function compileSchema(schema: Urichk): string {
         }
         for (const {comment, tailType, matchType, pattern} of tail) {
             comment && write(comment.text);
-            const tailKey = tailType.label?.text ?? tailType.type.text;
+            const tailKey = tailType.text;
             write(`
                 {
-                    const tail = ${ tailType.type.text === '?' ? 'search' : 'hash' };
+                    const tail = ${ tailType.text === '?' ? 'search' : 'hash' };
+                    const tailKey = ${JSON.stringify(tailKey)};
             `);
             if (matchType.text === 'match') {
-                const {type, value} = (pattern as Exclude<typeof pattern, TailRuleForm['pattern']>);
-                if (type === 'id') {
-                    write(`
-                        if (tail === ${JSON.stringify(value.text)}) {
-                            result[${JSON.stringify(tailKey)}] = tail;
-                        }
-                    `);
-                } else if (type === 'regex') {
-                    write(`
-                        if (${value.text}.test(tail)) {
-                            result[${JSON.stringify(tailKey)}] = tail;
-                        }
-                    `);
-                }
+                write(`
+                    if (${compileTailRulePattern('tail', pattern as Exclude<typeof pattern, TailRuleForm['pattern']>)}) {
+                        result[tailKey] = tail;
+                    } else {
+                        // TODO
+                    }
+                `);
             } else if (matchType.text === 'form') {
-                // TODO
+                write(`
+                    const form = new URLSearchParams(tail);
+                    const formResult = {};
+                `);
+                for (const {comment, key, value, array} of (pattern as Exclude<typeof pattern, TailRuleMatch['pattern']>)) {
+                    comment && write(comment.text);
+                    if (array) {
+                        write(`{
+                            const values = form.getAll(${compileKeyToken(key)});
+                            if (values.every(
+                                value => ${compileTailRulePattern('value', value)}
+                            )) {
+                                formResult[${compileKeyToken(key)}] = values;
+                            } else {
+                                // TODO
+                            }
+                        }`);
+                    } else {
+                        if (value) {
+                            write(`{
+                                const value = form.get(${compileKeyToken(key)});
+                                if (${compileTailRulePattern('value', value)}) {
+                                    formResult[${compileKeyToken(key)}] = value;
+                                } else {
+                                    // TODO
+                                }
+                            }`);
+                        } else {
+                            write(`{
+                                if (form.has(${compileKeyToken(key)})) {
+                                    formResult[${compileKeyToken(key)}] = true;
+                                } else {
+                                    // TODO
+                                }
+                            }`);
+                        }
+                    }
+                }
+                write(`
+                    result[tailKey] = formResult;
+                `);
             }
             write(`
                 }
@@ -103,4 +138,23 @@ export function compileSchema(schema: Urichk): string {
         ];
     `);
     return buffer.join('');
+}
+
+function compileKeyToken(key: Key): string {
+    switch (key.type) {
+        case 'id': return JSON.stringify(key.value.text);
+        case 'string': return key.value.text;
+    }
+}
+
+function compileTailRulePattern(valueExp: string, pattern: TailRulePatternValue[]): string {
+    return pattern.map(({ type, value }) => {
+        if (type === 'id') {
+            return `${valueExp} === ${JSON.stringify(value.text)}`;
+        } else if (type === 'string') {
+            return `${valueExp} === ${value.text}`;
+        } else if (type === 'regex') {
+            return `${value.text}.test(${valueExp})`;
+        }
+    }).map(code => `(${code})`).join('||');
 }

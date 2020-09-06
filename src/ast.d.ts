@@ -39,18 +39,26 @@ export type Tail = TailRule[];
 export type TailRule = TailRuleMatch | TailRuleForm;
 export interface TailRuleBase<TMatch extends Token> {
     comment?: Token;
-    tailType: { type: Token<'?' | '#'>, label?: Token };
+    tailType: Token<'?' | '#'>;
     matchType: TMatch;
 }
 export interface TailRuleMatch extends TailRuleBase<Token<'match'>> {
-    pattern: { type: 'id' | 'regex', value: Token };
+    pattern: TailRulePatternValue[];
 }
 export interface TailRuleForm extends TailRuleBase<Token<'form'>> {
     pattern: TailRuleFormPatternRule[];
 }
+export interface Key {
+    type: 'id' | 'string';
+    value: Token;
+}
 export interface TailRuleFormPatternRule {
     comment?: Token;
-    key: { type: 'id' | 'string', value: Token };
-    value: { type: 'id' | 'string' | 'regex', value: Token }[];
+    key: Key;
+    value: TailRulePatternValue[];
     array: boolean;
+}
+export interface TailRulePatternValue {
+    type: 'id' | 'string' | 'regex';
+    value: Token;
 }

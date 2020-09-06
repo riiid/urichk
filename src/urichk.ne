@@ -75,17 +75,15 @@ path_fragment ->
 tail_rule ->
       tail_rule_match {% id %}
     | tail_rule_form {% id %}
-tail_rule_tail_type -> ("?" | "#") tail_rule_tail_type_label:? {% ([[type], label]) => ({ type, label }) %}
-tail_rule_tail_type_label -> _ ":" _ ident {% ([, , , label]) => label %}
+tail_rule_tail_type ->
+      "?" {% id %}
+    | "#" {% id %}
 tail_rule_match ->
-    tail_rule_tail_type _ "match" _ tail_rule_match_pattern {% ([tailType, , matchType, , pattern]) => ({
+    tail_rule_tail_type _ "match" _ tail_rule_pattern_value {% ([tailType, , matchType, , pattern]) => ({
         tailType,
         matchType,
         pattern,
     }) %}
-tail_rule_match_pattern ->
-      ident {% ([value]) => ({ type: 'id', value }) %}
-    | %regex {% ([value]) => ({ type: 'regex', value }) %}
 tail_rule_form ->
     tail_rule_tail_type _ "form" _ tail_rule_form_pattern {% ([tailType, , matchType, , pattern]) => ({
         tailType,
@@ -95,13 +93,13 @@ tail_rule_form ->
 tail_rule_form_pattern -> "{" (_ tail_rule_form_pattern_rule):* _ "}" {% ([, rules]) => rules.map(([comment, rule]) => ({ comment, ...rule })) %}
 tail_rule_form_pattern_rule ->
       tail_rule_form_pattern_rule_key {% ([key]) => ({ key, value: null, array: false }) %}
-    | tail_rule_form_pattern_rule_key _ "=" _ tail_rule_form_pattern_rule_value
+    | tail_rule_form_pattern_rule_key _ "=" _ tail_rule_pattern_value
     {% ([key, /*_*/, /*"="*/, /*_*/, value]) => ({
         key,
         value,
         array: false,
     }) %}
-    | tail_rule_form_pattern_rule_key _ "[" _ "]" _ "=" _ tail_rule_form_pattern_rule_value
+    | tail_rule_form_pattern_rule_key _ "[" _ "]" _ "=" _ tail_rule_pattern_value
     {% ([key, /*_*/, /*[*/, /*_*/, /*]*/, /*_*/, /*"="*/, /*_*/, value]) => ({
         key,
         value,
@@ -110,10 +108,10 @@ tail_rule_form_pattern_rule ->
 tail_rule_form_pattern_rule_key ->
       ident {% ([value]) => ({ type: 'id', value }) %}
     | %string {% ([value]) => ({ type: 'string', value }) %}
-tail_rule_form_pattern_rule_value ->
-    ("|" _):? (tail_rule_form_pattern_rule_value_term _ "|" _):* tail_rule_form_pattern_rule_value_term
+tail_rule_pattern_value ->
+    ("|" _):? (tail_rule_pattern_value_term _ "|" _):* tail_rule_pattern_value_term
     {% ([, rules, rule]) => [...rules.map(([rule]) => rule), rule] %}
-tail_rule_form_pattern_rule_value_term ->
+tail_rule_pattern_value_term ->
       ident {% ([value]) => ({ type: 'id', value }) %}
     | %string {% ([value]) => ({ type: 'string', value }) %}
     | %regex {% ([value]) => ({ type: 'regex', value }) %}

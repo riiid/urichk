@@ -11,6 +11,13 @@
     "build": "tsc && yarn build:nearley",
     "build:nearley": "nearleyc src/urichk.ne -o lib/urichk.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/disjukr/urichk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/disjukr/urichk/issues"
+  },
   "dependencies": {
     "moo": "^0.5.1",
     "nearley": "^2.19.5"

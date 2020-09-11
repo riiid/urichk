@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "urichk",
+  "version": "0.0.0",
+  "workspaces": [
+    "urichk"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "dev": "ultra -r dev",
+    "build": "ultra -r -b build"
+  },
+  "dependencies": {
+    "ultra-runner": "^3.5.0"
+  }
+}

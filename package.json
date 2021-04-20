@@ -2,17 +2,11 @@
   "private": true,
   "name": "urichk",
   "version": "0.0.0",
-  "workspaces": [
-    "urichk"
-  ],
-  "engines": {
-    "node": ">=14"
-  },
+  "license": "(MIT OR Apache-2.0)",
   "scripts": {
-    "dev": "ultra -r dev",
-    "build": "ultra -r -b build"
+    "build:nearley": "nearleyc urichk.ne -o generated/urichk.js"
   },
   "dependencies": {
-    "ultra-runner": "^3.5.0"
+    "nearley": "^2.20.1"
   }
 }

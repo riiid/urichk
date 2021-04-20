@@ -1,7 +1,7 @@
 # urichk
 schema for checking uri
 
-[syntax specification](./urichk/src/urichk.ne)
+[syntax specification](./urichk.ne)
 
 ## example
 

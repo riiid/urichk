@@ -5,10 +5,10 @@ import type { Urichk } from "./ast.ts";
 const compiledRules = _compiledRules as unknown as nearley.CompiledRules;
 
 export const lexer = compiledRules.Lexer!;
-export const parser = new nearley.Parser(
-  nearley.Grammar.fromCompiled(compiledRules),
-);
 export function parse(schema: string): undefined | Urichk {
+  const parser = new nearley.Parser(
+    nearley.Grammar.fromCompiled(compiledRules),
+  );
   parser.feed(schema);
   return parser.finish()[0];
 }

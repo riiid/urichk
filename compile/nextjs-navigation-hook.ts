@@ -40,7 +40,7 @@ export function compile(
   }}
     export default function ${defaultFunctionName}(): NavigateFn {
       const router = useRouter();
-      return useCallback(function navigate(path, searchParams, config) {
+      return useCallback(function navigate(path: string, searchParams: any, config?: Partial<NavigateConfig>) {
         const replace = !!config?.replace;
         const shallow = !!config?.shallow;
         const navigateFn = replace ? router.replace : router.push;

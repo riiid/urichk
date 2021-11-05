@@ -1,7 +1,7 @@
 @preprocessor urichk
 
 @{%
-  import moo from "https://deno.land/x/moo@0.5.1-deno.2/mod.ts";
+  import { compile } from "https://deno.land/x/moo@0.5.1-deno.2/mod.ts";
   const commonTokenRules = {
     num: /[0-9]+/,
     ln: { match: /\r?\n/, lineBreaks: true },
@@ -10,7 +10,7 @@
     sc: /\/\/[^\r\n]*\r?\n/,
     mc: /\/\*(?:\*(?!\/)|[^*])*\*\//,
   };
-  const lexer = moo.states({
+  const lexer = compile({
     root: {
       ...commonTokenRules,
       lcb: { match: '{', push: 'block' },

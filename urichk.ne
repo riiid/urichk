@@ -1,7 +1,7 @@
 @preprocessor urichk
 
 @{%
-  import moo from "https://deno.land/x/moo@0.5.1-deno/mod.ts";
+  import moo from "https://deno.land/x/moo@0.5.1-deno.2/mod.ts";
   const commonTokenRules = {
     num: /[0-9]+/,
     ln: { match: /\r?\n/, lineBreaks: true },

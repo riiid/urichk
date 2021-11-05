@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "license": "(MIT OR Apache-2.0)",
   "scripts": {
-    "build:nearley": "nearleyc urichk.ne -o generated/urichk.js"
+    "build:nearley": "node script/nearleyc.js"
   },
   "dependencies": {
     "nearley": "^2.20.1"

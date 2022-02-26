@@ -1,6 +1,6 @@
 import * as ast from "../ast.ts";
 
-interface Visitor {
+export interface Visitor {
   visitUrichk: VisitFn<ast.Urichk>;
   visitRule: VisitFn<ast.Rule>;
   visitHead: VisitFn<ast.Head>;
@@ -124,11 +124,15 @@ export const visitor: Visitor = {
     if (comment) visitor.visitComment(visitor, comment);
     visitor.visitKey(visitor, key);
     visitor.visitArrayToken(visitor, array);
-    for (const patternValue of value) {
-      visitor.visitTailRulePatternValue(visitor, patternValue);
+    if (value) {
+      for (const patternValue of value) {
+        visitor.visitTailRulePatternValue(visitor, patternValue);
+      }
     }
   },
-  visitKey() {},
+  visitKey(visitor, node) {
+    visitor.visitToken(visitor, node.value);
+  },
   visitArrayToken() {},
   visitTailType(visitor, node) {
     visitor.visitToken(visitor, node);

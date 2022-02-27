@@ -38,7 +38,8 @@ export const visitor: Visitor = {
     }
   },
   visitRule(visitor, node) {
-    const { head, tail } = node;
+    const { head, tail, comment } = node;
+    if (comment) visitor.visitComment(visitor, comment);
     visitor.visitHead(visitor, head);
     visitor.visitTail(visitor, tail);
   },

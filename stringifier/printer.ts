@@ -11,7 +11,7 @@ export interface CreatePrinterConfig {
   space?: string;
 }
 export function createPrinter(config?: CreatePrinterConfig): Printer {
-  const { space = "  " } = { ...config };
+  const { space = "    " } = { ...config };
   const buffer: string[] = [];
   let _indent = 0;
   return {

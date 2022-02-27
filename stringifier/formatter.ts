@@ -36,16 +36,18 @@ export default function format(ast: ast.Urichk): string {
     },
     visitTail(visitor, node) {
       printer.print("{");
-      printer.print("\n");
       printer.indent();
-      defaultVisitor.visitTail(visitor, node);
+      for (const rule of node) {
+        printer.print("\n");
+        visitor.visitTailRule(visitor, rule);
+        printer.print("\n");
+      }
       printer.dedent();
       printer.println("}\n");
     },
     visitTailRule(visitor, node) {
       printer.printIndent();
       defaultVisitor.visitTailRule(visitor, node);
-      printer.print("\n");
     },
     visitTailRuleMatch(visitor, node) {
       const { matchType, pattern } = node;

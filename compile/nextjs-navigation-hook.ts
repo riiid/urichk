@@ -55,7 +55,7 @@ export function compile(
   `;
 }
 
-function getSearchParamsTypeCode(tailRuleForm?: TailRuleForm) {
+export function getSearchParamsTypeCode(tailRuleForm?: TailRuleForm) {
   if (!tailRuleForm) return "{}";
   return (
     "{\n" +
@@ -83,7 +83,7 @@ function getTailRuleFormPatternRuleKeyCode(
   }
 }
 
-function getTailRuleForm(tail: Tail) {
+export function getTailRuleForm(tail: Tail) {
   return tail.find((tailRule) => {
     if (tailRule.tailType.text !== "?") return false;
     if (tailRule.matchType.text !== "form") return false;
@@ -91,7 +91,7 @@ function getTailRuleForm(tail: Tail) {
   }) as TailRuleForm | undefined;
 }
 
-function urichkPathToString(path: Path) {
+export function urichkPathToString(path: Path) {
   return "/" + path.map((fragment) => {
     switch (fragment.type) {
       case "static":

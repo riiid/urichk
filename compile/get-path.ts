@@ -31,7 +31,7 @@ export function compile(
     }).join("\n")
   }
     }
-    export default function ${defaultFunctionName}<Path extends keyof PathOptionTable>(path: Path, searchParams: PathOptionTable[Path]): string {
+    export default function ${defaultFunctionName}<Path extends keyof PathOptionTable>(path: Path, searchParams?: PathOptionTable[Path]): string {
       const query = (
           searchParams ?
           '?' + encode(searchParams) :

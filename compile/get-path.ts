@@ -19,7 +19,7 @@ export function compile(
   return `
 import {encode} from 'querystring';
 
-export interface PathOptionTable {${
+export interface PathParamsTable {${
     schema.map((rule) => {
       const path = JSON.stringify(urichkPathToString(rule.head.path || []));
       const tailRuleForm = getTailRuleForm(rule.tail);
@@ -32,7 +32,7 @@ export interface PathOptionTable {${
   }
 }
 
-export default function ${defaultFunctionName}<Path extends keyof PathOptionTable>(path: Path, searchParams?: PathOptionTable[Path]): string {
+export default function ${defaultFunctionName}<Path extends keyof PathParamsTable>(path: Path, searchParams?: PathParamsTable[Path]): string {
   const query = (
       searchParams ?
       '?' + encode(searchParams) :

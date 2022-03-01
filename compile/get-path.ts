@@ -17,9 +17,9 @@ export function compile(
   const { name = "" } = config ?? {};
   const defaultFunctionName = `get${kebabToPascal(name)}Path`;
   return `
-    import {encode} from 'querystring';
+import {encode} from 'querystring';
 
-    export interface PathOptionTable {${
+export interface PathOptionTable {${
     schema.map((rule) => {
       const path = JSON.stringify(urichkPathToString(rule.head.path || []));
       const tailRuleForm = getTailRuleForm(rule.tail);
@@ -30,23 +30,15 @@ export function compile(
       `;
     }).join("\n")
   }
-    }
-    export default function ${defaultFunctionName}<Path extends keyof PathOptionTable>(path: Path, searchParams?: PathOptionTable[Path]): string {
-      const query = (
-          searchParams ?
-          '?' + encode(searchParams) :
-          ''
-        );
-      return path + query;
-    }
+}
+
+export default function ${defaultFunctionName}<Path extends keyof PathOptionTable>(path: Path, searchParams?: PathOptionTable[Path]): string {
+  const query = (
+      searchParams ?
+      '?' + encode(searchParams) :
+      ''
+    );
+  return path + query;
+}
   `;
 }
-
-/**
-export interface PathFn {
-  ["webview/hello"]: WebviewHelloOption;
-}
-
-getPath = (path: keyof<, option: )
-
- */

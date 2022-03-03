@@ -1,6 +1,7 @@
 import { build, emptyDir } from "https://deno.land/x/dnt@0.21.0/mod.ts";
+import packageJson from "../package.json" assert { type: "json" };
 
-await emptyDir("./npm");
+await emptyDir("./tmp/npm");
 
 await build({
   entryPoints: [
@@ -10,13 +11,13 @@ await build({
     "./compile/nextjs-navigation-hook.ts",
     "./compile/nextjs-search-params-hook.ts",
   ],
-  outDir: "./npm",
+  outDir: "./tmp/npm",
   shims: {
     deno: true,
   },
   package: {
     name: "urichk",
-    version: Deno.args[0],
+    version: Deno.args[0] || packageJson.version,
     description: "Schema for checking uri",
     license: "(MIT OR Apache-2.0)",
     repository: {
@@ -33,6 +34,6 @@ await build({
   packageManager: "yarn",
 });
 
-Deno.copyFileSync("LICENSE-MIT", "npm/LICENSE-MIT");
-Deno.copyFileSync("LICENSE-APACHE", "npm/LICENSE-APACHE");
-Deno.copyFileSync("README.md", "npm/README.md");
+Deno.copyFileSync("LICENSE-MIT", "tmp/npm/LICENSE-MIT");
+Deno.copyFileSync("LICENSE-APACHE", "tmp/npm/LICENSE-APACHE");
+Deno.copyFileSync("README.md", "tmp/npm/README.md");

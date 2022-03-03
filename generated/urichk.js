@@ -2,7 +2,7 @@
     // nearley version: 2.20.1
     // export name: urichk
     
-  import { compileStates } from "https://deno.land/x/moo@0.5.1-deno.2/mod.ts";
+  import { states } from "https://deno.land/x/moo@0.5.1.1/index.ts";
   const commonTokenRules = {
     num: /[0-9]+/,
     ln: { match: /\r?\n/, lineBreaks: true },
@@ -11,7 +11,7 @@
     sc: /\/\/[^\r\n]*\r?\n/,
     mc: /\/\*(?:\*(?!\/)|[^*])*\*\//,
   };
-  const lexer = compileStates({
+  const lexer = states({
     root: {
       ...commonTokenRules,
       lcb: { match: '{', push: 'block' },

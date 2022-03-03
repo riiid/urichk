@@ -5,6 +5,7 @@ await emptyDir("./npm");
 await build({
   entryPoints: [
     "./index.ts",
+    "./compile/get-path.ts",
     "./compile/js-url-checker.ts",
     "./compile/nextjs-navigation-hook.ts",
     "./compile/nextjs-search-params-hook.ts",

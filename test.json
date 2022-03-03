@@ -1,0 +1,780 @@
+[
+    {
+        "head": {
+            "scheme": {
+                "type": "id",
+                "value": "scheme",
+                "text": "scheme",
+                "offset": 1,
+                "lineBreaks": 0,
+                "line": 2,
+                "col": 1
+            },
+            "authority": {
+                "userinfo": null,
+                "host": {
+                    "type": "id",
+                    "value": "example1.com",
+                    "text": "example1.com",
+                    "offset": 8,
+                    "lineBreaks": 0,
+                    "line": 2,
+                    "col": 8
+                },
+                "port": null
+            },
+            "path": [
+                {
+                    "type": "static",
+                    "name": {
+                        "type": "id",
+                        "value": "foo",
+                        "text": "foo",
+                        "offset": 21,
+                        "lineBreaks": 0,
+                        "line": 2,
+                        "col": 21
+                    }
+                },
+                {
+                    "type": "static",
+                    "name": {
+                        "type": "id",
+                        "value": "bar",
+                        "text": "bar",
+                        "offset": 25,
+                        "lineBreaks": 0,
+                        "line": 2,
+                        "col": 25
+                    }
+                },
+                {
+                    "type": "static",
+                    "name": {
+                        "type": "id",
+                        "value": "baz",
+                        "text": "baz",
+                        "offset": 29,
+                        "lineBreaks": 0,
+                        "line": 2,
+                        "col": 29
+                    }
+                }
+            ]
+        },
+        "tail": [
+            {
+                "tailType": {
+                    "type": "symbol",
+                    "value": "?",
+                    "text": "?",
+                    "offset": 37,
+                    "lineBreaks": 0,
+                    "line": 3,
+                    "col": 3
+                },
+                "matchType": {
+                    "type": "id",
+                    "value": "match",
+                    "text": "match",
+                    "offset": 39,
+                    "lineBreaks": 0,
+                    "line": 3,
+                    "col": 5
+                },
+                "pattern": [
+                    {
+                        "type": "regex",
+                        "value": {
+                            "type": "regex",
+                            "value": "/web-path=(?<path>.*)/",
+                            "text": "/web-path=(?<path>.*)/",
+                            "offset": 45,
+                            "lineBreaks": 0,
+                            "line": 3,
+                            "col": 11
+                        }
+                    }
+                ]
+            },
+            {
+                "tailType": {
+                    "type": "symbol",
+                    "value": "#",
+                    "text": "#",
+                    "offset": 70,
+                    "lineBreaks": 0,
+                    "line": 4,
+                    "col": 3
+                },
+                "matchType": {
+                    "type": "id",
+                    "value": "match",
+                    "text": "match",
+                    "offset": 72,
+                    "lineBreaks": 0,
+                    "line": 4,
+                    "col": 5
+                },
+                "pattern": [
+                    {
+                        "type": "id",
+                        "value": {
+                            "type": "id",
+                            "value": "id-1",
+                            "text": "id-1",
+                            "offset": 84,
+                            "lineBreaks": 0,
+                            "line": 5,
+                            "col": 7
+                        }
+                    },
+                    {
+                        "type": "id",
+                        "value": {
+                            "type": "id",
+                            "value": "id-2",
+                            "text": "id-2",
+                            "offset": 95,
+                            "lineBreaks": 0,
+                            "line": 6,
+                            "col": 7
+                        }
+                    },
+                    {
+                        "type": "regex",
+                        "value": {
+                            "type": "regex",
+                            "value": "/id-3/",
+                            "text": "/id-3/",
+                            "offset": 106,
+                            "lineBreaks": 0,
+                            "line": 7,
+                            "col": 7
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "comment": {
+            "type": "mc",
+            "value": "/**\n * foo\n */",
+            "text": "/**\n * foo\n */",
+            "offset": 116,
+            "lineBreaks": 0,
+            "line": 10,
+            "col": 1
+        },
+        "head": {
+            "scheme": {
+                "type": "id",
+                "value": "scheme",
+                "text": "scheme",
+                "offset": 131,
+                "lineBreaks": 0,
+                "line": 11,
+                "col": 1
+            },
+            "authority": {
+                "userinfo": null,
+                "host": {
+                    "type": "id",
+                    "value": "example2.com",
+                    "text": "example2.com",
+                    "offset": 138,
+                    "lineBreaks": 0,
+                    "line": 11,
+                    "col": 8
+                },
+                "port": null
+            },
+            "path": [
+                {
+                    "type": "static",
+                    "name": {
+                        "type": "id",
+                        "value": "path",
+                        "text": "path",
+                        "offset": 151,
+                        "lineBreaks": 0,
+                        "line": 11,
+                        "col": 21
+                    }
+                },
+                {
+                    "type": "param",
+                    "name": {
+                        "type": "id",
+                        "value": "param1",
+                        "text": "param1",
+                        "offset": 157,
+                        "lineBreaks": 0,
+                        "line": 11,
+                        "col": 27
+                    }
+                },
+                {
+                    "type": "param",
+                    "name": {
+                        "type": "id",
+                        "value": "param2",
+                        "text": "param2",
+                        "offset": 166,
+                        "lineBreaks": 0,
+                        "line": 11,
+                        "col": 36
+                    }
+                }
+            ]
+        },
+        "tail": [
+            {
+                "comment": {
+                    "type": "mc",
+                    "value": "/**\n   * bar\n   */",
+                    "text": "/**\n   * bar\n   */",
+                    "offset": 178,
+                    "lineBreaks": 0,
+                    "line": 12,
+                    "col": 3
+                },
+                "tailType": {
+                    "type": "symbol",
+                    "value": "?",
+                    "text": "?",
+                    "offset": 199,
+                    "lineBreaks": 0,
+                    "line": 13,
+                    "col": 3
+                },
+                "matchType": {
+                    "type": "id",
+                    "value": "form",
+                    "text": "form",
+                    "offset": 201,
+                    "lineBreaks": 0,
+                    "line": 13,
+                    "col": 5
+                },
+                "pattern": [
+                    {
+                        "comment": {
+                            "type": "mc",
+                            "value": "/**\n     * baz\n     */",
+                            "text": "/**\n     * baz\n     */",
+                            "offset": 212,
+                            "lineBreaks": 0,
+                            "line": 14,
+                            "col": 5
+                        },
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "''",
+                                "text": "''",
+                                "offset": 239,
+                                "lineBreaks": 0,
+                                "line": 15,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "string",
+                                "value": {
+                                    "type": "string",
+                                    "value": "''",
+                                    "text": "''",
+                                    "offset": 244,
+                                    "lineBreaks": 0,
+                                    "line": 15,
+                                    "col": 10
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "id",
+                            "value": {
+                                "type": "id",
+                                "value": "a",
+                                "text": "a",
+                                "offset": 251,
+                                "lineBreaks": 0,
+                                "line": 16,
+                                "col": 5
+                            }
+                        },
+                        "value": null,
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "id",
+                            "value": {
+                                "type": "id",
+                                "value": "b",
+                                "text": "b",
+                                "offset": 257,
+                                "lineBreaks": 0,
+                                "line": 17,
+                                "col": 5
+                            }
+                        },
+                        "value": null,
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "id",
+                            "value": {
+                                "type": "id",
+                                "value": "param1",
+                                "text": "param1",
+                                "offset": 263,
+                                "lineBreaks": 0,
+                                "line": 18,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "id",
+                                "value": {
+                                    "type": "id",
+                                    "value": "exact",
+                                    "text": "exact",
+                                    "offset": 272,
+                                    "lineBreaks": 0,
+                                    "line": 18,
+                                    "col": 14
+                                }
+                            },
+                            {
+                                "type": "id",
+                                "value": {
+                                    "type": "id",
+                                    "value": "match",
+                                    "text": "match",
+                                    "offset": 280,
+                                    "lineBreaks": 0,
+                                    "line": 18,
+                                    "col": 22
+                                }
+                            },
+                            {
+                                "type": "id",
+                                "value": {
+                                    "type": "id",
+                                    "value": "value",
+                                    "text": "value",
+                                    "offset": 288,
+                                    "lineBreaks": 0,
+                                    "line": 18,
+                                    "col": 30
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "id",
+                            "value": {
+                                "type": "id",
+                                "value": "param2",
+                                "text": "param2",
+                                "offset": 298,
+                                "lineBreaks": 0,
+                                "line": 19,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/^[0-9]+$/",
+                                    "text": "/^[0-9]+$/",
+                                    "offset": 307,
+                                    "lineBreaks": 0,
+                                    "line": 19,
+                                    "col": 14
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "id",
+                            "value": {
+                                "type": "id",
+                                "value": "param3",
+                                "text": "param3",
+                                "offset": 322,
+                                "lineBreaks": 0,
+                                "line": 20,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/^[a-z]+$/i",
+                                    "text": "/^[a-z]+$/i",
+                                    "offset": 334,
+                                    "lineBreaks": 0,
+                                    "line": 20,
+                                    "col": 17
+                                }
+                            }
+                        ],
+                        "array": true
+                    }
+                ]
+            },
+            {
+                "tailType": {
+                    "type": "symbol",
+                    "value": "#",
+                    "text": "#",
+                    "offset": 352,
+                    "lineBreaks": 0,
+                    "line": 22,
+                    "col": 3
+                },
+                "matchType": {
+                    "type": "id",
+                    "value": "match",
+                    "text": "match",
+                    "offset": 354,
+                    "lineBreaks": 0,
+                    "line": 22,
+                    "col": 5
+                },
+                "pattern": [
+                    {
+                        "type": "regex",
+                        "value": {
+                            "type": "regex",
+                            "value": "/id/",
+                            "text": "/id/",
+                            "offset": 360,
+                            "lineBreaks": 0,
+                            "line": 22,
+                            "col": 11
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "head": {
+            "scheme": {
+                "type": "id",
+                "value": "scheme",
+                "text": "scheme",
+                "offset": 368,
+                "lineBreaks": 0,
+                "line": 25,
+                "col": 1
+            },
+            "authority": {
+                "userinfo": {
+                    "type": "id",
+                    "value": "username",
+                    "text": "username",
+                    "offset": 375,
+                    "lineBreaks": 0,
+                    "line": 25,
+                    "col": 8
+                },
+                "host": {
+                    "type": "id",
+                    "value": "example3.com",
+                    "text": "example3.com",
+                    "offset": 384,
+                    "lineBreaks": 0,
+                    "line": 25,
+                    "col": 17
+                },
+                "port": {
+                    "type": "num",
+                    "value": "4321",
+                    "text": "4321",
+                    "offset": 397,
+                    "lineBreaks": 0,
+                    "line": 25,
+                    "col": 30
+                }
+            },
+            "path": null
+        },
+        "tail": [
+            {
+                "tailType": {
+                    "type": "symbol",
+                    "value": "?",
+                    "text": "?",
+                    "offset": 406,
+                    "lineBreaks": 0,
+                    "line": 26,
+                    "col": 3
+                },
+                "matchType": {
+                    "type": "id",
+                    "value": "form",
+                    "text": "form",
+                    "offset": 408,
+                    "lineBreaks": 0,
+                    "line": 26,
+                    "col": 5
+                },
+                "pattern": [
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'a'",
+                                "text": "'a'",
+                                "offset": 419,
+                                "lineBreaks": 0,
+                                "line": 27,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 425,
+                                    "lineBreaks": 0,
+                                    "line": 27,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'b'",
+                                "text": "'b'",
+                                "offset": 434,
+                                "lineBreaks": 0,
+                                "line": 28,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 440,
+                                    "lineBreaks": 0,
+                                    "line": 28,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'c-d'",
+                                "text": "'c-d'",
+                                "offset": 449,
+                                "lineBreaks": 0,
+                                "line": 29,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 457,
+                                    "lineBreaks": 0,
+                                    "line": 29,
+                                    "col": 13
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'/'",
+                                "text": "'/'",
+                                "offset": 466,
+                                "lineBreaks": 0,
+                                "line": 30,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 472,
+                                    "lineBreaks": 0,
+                                    "line": 30,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'?'",
+                                "text": "'?'",
+                                "offset": 481,
+                                "lineBreaks": 0,
+                                "line": 31,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 487,
+                                    "lineBreaks": 0,
+                                    "line": 31,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'f/'",
+                                "text": "'f/'",
+                                "offset": 496,
+                                "lineBreaks": 0,
+                                "line": 32,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 503,
+                                    "lineBreaks": 0,
+                                    "line": 32,
+                                    "col": 12
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'g'",
+                                "text": "'g'",
+                                "offset": 512,
+                                "lineBreaks": 0,
+                                "line": 33,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 518,
+                                    "lineBreaks": 0,
+                                    "line": 33,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    },
+                    {
+                        "key": {
+                            "type": "string",
+                            "value": {
+                                "type": "string",
+                                "value": "'h'",
+                                "text": "'h'",
+                                "offset": 527,
+                                "lineBreaks": 0,
+                                "line": 34,
+                                "col": 5
+                            }
+                        },
+                        "value": [
+                            {
+                                "type": "regex",
+                                "value": {
+                                    "type": "regex",
+                                    "value": "/.*/",
+                                    "text": "/.*/",
+                                    "offset": 533,
+                                    "lineBreaks": 0,
+                                    "line": 34,
+                                    "col": 11
+                                }
+                            }
+                        ],
+                        "array": false
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -55,7 +55,7 @@ export interface Key {
 export interface TailRuleFormPatternRule {
   comment?: Token;
   key: Key;
-  value: TailRulePatternValue[];
+  value: TailRulePatternValue[] | null;
   array: boolean;
 }
 export interface TailRulePatternValue {

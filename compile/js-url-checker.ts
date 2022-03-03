@@ -166,7 +166,7 @@ export function compile(
             write(`{
               const values = form.getAll(${compileKeyToken(key)});
               if (values.every(
-                value => ${compileTailRulePattern("value", value)}
+                value => ${compileTailRulePattern("value", value ?? [])}
               )) {
                 formResult[${compileKeyToken(key)}] = values;
               } else {

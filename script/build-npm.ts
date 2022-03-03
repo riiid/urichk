@@ -10,6 +10,7 @@ await build({
     "./compile/js-url-checker.ts",
     "./compile/nextjs-navigation-hook.ts",
     "./compile/nextjs-search-params-hook.ts",
+    "./stringifier/formatter.ts",
   ],
   outDir: "./tmp/npm",
   shims: {
@@ -28,7 +29,7 @@ await build({
       url: "https://github.com/riiid/urichk/issues",
     },
   },
-  declaration: false,
+  declaration: true,
   typeCheck: false,
   test: false,
   packageManager: "yarn",

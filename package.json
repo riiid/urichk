@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "license": "(MIT OR Apache-2.0)",
   "scripts": {
-    "build:nearley": "node script/nearleyc.js"
+    "build:nearley": "node script/nearleyc.js",
+    "build:npm": "deno run -A script/build-npm.ts"
   },
   "dependencies": {
     "nearley": "^2.20.1"

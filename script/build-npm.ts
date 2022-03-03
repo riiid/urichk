@@ -29,6 +29,12 @@ await build({
       url: "https://github.com/riiid/urichk/issues",
     },
   },
+  mappings: {
+    "https://deno.land/x/moo@0.5.1-deno.2/mod.ts": {
+      name: "moo",
+      version: "0.5.1",
+    },
+  },
   declaration: true,
   typeCheck: false,
   test: false,

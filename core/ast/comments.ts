@@ -1,0 +1,24 @@
+import {
+  Span,
+  Token,
+} from "https://deno.land/x/pbkit@v0.0.39/core/parser/recursive-descent-parser.ts";
+
+export type Node =
+  | CommentGroup
+  | SinglelineComment
+  | MultilineComment;
+
+export interface CommentGroup extends Span {
+  type: "comment-group";
+  comments: Comment[];
+}
+
+export type Comment = SinglelineComment | MultilineComment;
+
+export interface SinglelineComment extends Token {
+  type: "singleline-comment";
+}
+
+export interface MultilineComment extends Token {
+  type: "multiline-comment";
+}

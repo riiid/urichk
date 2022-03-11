@@ -176,10 +176,12 @@ function acceptTailRules(parser: RecursiveDescentParser): ast.TailRule[] {
 function acceptTailRule(
   parser: RecursiveDescentParser,
 ): ast.TailRule | undefined {
-  const tailType = parser.accept(/\?|#/) as ast.Token<"?" | "#">;
+  const tailType = parser.accept(/^(\?|#)/) as ast.Token<"?" | "#">;
   if (!tailType) return;
   skipWsAndComments(parser);
-  const matchType = parser.accept(/form|match/) as ast.Token<"match" | "form">;
+  const matchType = parser.accept(/^(form|match)/) as ast.Token<
+    "match" | "form"
+  >;
   if (!matchType) return;
   skipWsAndComments(parser);
   switch (matchType.text) {
@@ -331,12 +333,12 @@ const whitespaceWithoutNewlinePattern =
   /^[ \f\t\v\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+/;
 const newlinePattern = /^\r?\n/;
 const identPattern = /^(?:[a-zA-Z0-9\-._~]|%[0-9a-fA-F]{2})+/;
-const strLitPattern = /'.*?'/;
+const strLitPattern = /^'.*?'/;
 const multilineCommentPattern = /^\/\*(?:.|\r?\n)*?\*\//;
 const singlelineCommentPattern = /^\/\/.*(?:\r?\n|$)/;
 const schemePattern = /^[a-z][a-z0-9\+-\.]*/i;
 const regexPattern =
-  /\/(?:(?![*+?])(?:[^\r\n\[/\\]|\\.|\[(?:[^\r\n\]\\]|\\.)*\])+)\/[a-z]*/;
+  /^\/(?:(?![*+?])(?:[^\r\n\[/\\]|\\.|\[(?:[^\r\n\]\\]|\\.)*\])+)\/[a-z]*/;
 
 function acceptSpecialToken<TType extends string>(
   parser: RecursiveDescentParser,

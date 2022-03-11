@@ -690,3 +690,157 @@ scheme:username@example3.com:4321 {
     },
   ]);
 });
+
+Deno.test("#5", () => {
+  const { ast } = parse(`
+example3.com {
+  // hello
+  # match /id/
+}
+
+// bye
+example2.com:123 {
+  # match /id/
+}
+  `);
+  assertEquals(ast, [
+    {
+      "start": 1,
+      "end": 43,
+      "head": {
+        "start": 1,
+        "end": 13,
+        "scheme": undefined,
+        "authority": {
+          "start": 1,
+          "end": 13,
+          "userinfo": undefined,
+          "host": {
+            "start": 1,
+            "end": 13,
+            "text": "example3.com",
+          },
+          "port": undefined,
+        },
+        "path": undefined,
+      },
+      "tail": {
+        "start": 14,
+        "end": 43,
+        "openParens": {
+          "start": 14,
+          "end": 15,
+          "text": "{",
+        },
+        "rules": [
+          {
+            "tailType": {
+              "start": 29,
+              "end": 30,
+              "text": "#",
+            },
+            "matchType": {
+              "start": 31,
+              "end": 36,
+              "text": "match",
+            },
+            "pattern": [
+              {
+                "start": 37,
+                "end": 41,
+                "text": "/id/",
+                "type": "regex",
+              },
+            ],
+          },
+        ],
+        "closeParens": {
+          "start": 42,
+          "end": 43,
+          "text": "}",
+        },
+      },
+      "leadingComments": [],
+      "leadingDetachedComments": [],
+      "trailingComments": [],
+    },
+    {
+      "start": 45,
+      "end": 87,
+      "head": {
+        "start": 52,
+        "end": 68,
+        "scheme": {
+          "start": 52,
+          "end": 64,
+          "text": "example2.com",
+        },
+        "authority": {
+          "start": 65,
+          "end": 68,
+          "userinfo": undefined,
+          "host": {
+            "start": 65,
+            "end": 68,
+            "text": "123",
+          },
+          "port": undefined,
+        },
+        "path": undefined,
+      },
+      "tail": {
+        "start": 69,
+        "end": 87,
+        "openParens": {
+          "start": 69,
+          "end": 70,
+          "text": "{",
+        },
+        "rules": [
+          {
+            "tailType": {
+              "start": 73,
+              "end": 74,
+              "text": "#",
+            },
+            "matchType": {
+              "start": 75,
+              "end": 80,
+              "text": "match",
+            },
+            "pattern": [
+              {
+                "start": 81,
+                "end": 85,
+                "text": "/id/",
+                "type": "regex",
+              },
+            ],
+          },
+        ],
+        "closeParens": {
+          "start": 86,
+          "end": 87,
+          "text": "}",
+        },
+      },
+      "leadingComments": [
+        {
+          "start": 45,
+          "end": 52,
+          "type": "comment-group",
+          "comments": [
+            {
+              "type": "singleline-comment",
+              "start": 45,
+              "end": 52,
+              "text": "// bye\n",
+            },
+          ],
+        },
+      ],
+      "leadingDetachedComments": [],
+      "trailingComments": [],
+    },
+  ]);
+});

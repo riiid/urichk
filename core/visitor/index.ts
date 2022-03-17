@@ -1,4 +1,4 @@
-import * as ast from "../ast.ts";
+import * as ast from "../ast/index.ts";
 
 export interface Visitor {
   visitUrichk: VisitFn<ast.Urichk>;
@@ -20,10 +20,11 @@ export interface Visitor {
   visitTailRuleFormPatternRule: VisitFn<ast.TailRuleFormPatternRule>;
   visitTailRulePatternValue: VisitFn<ast.TailRulePatternValue>;
   visitKey: VisitFn<ast.Key>;
-  visitArrayToken: VisitFn<boolean>;
+  visitArrayToken: VisitFn<ast.Token>;
   visitTailType: VisitFn<ast.Token>;
   visitMatchType: VisitFn<ast.Token>;
-  visitComment: VisitFn<ast.Token>;
+  visitCommentGroup: VisitFn<ast.CommentGroup>;
+  visitComment: VisitFn<ast.Comment>;
   visitToken: VisitFn<ast.Token>;
 }
 
@@ -38,21 +39,27 @@ export const visitor: Visitor = {
     }
   },
   visitRule(visitor, node) {
-    const { head, tail, comment } = node;
-    if (comment) visitor.visitComment(visitor, comment);
-    visitor.visitHead(visitor, head);
-    visitor.visitTail(visitor, tail);
+    visitStatementBase(visitor, node, () => {
+      visitor.visitHead(visitor, node.head);
+      visitor.visitTail(visitor, node.tail);
+    });
   },
   visitHead(visitor, node) {
-    const { scheme, authority, path } = node;
-    if (scheme) visitor.visitScheme(visitor, scheme);
-    if (authority) visitor.visitAuthority(visitor, authority);
-    if (path) visitor.visitPath(visitor, path);
+    visitStatementBase(visitor, node, () => {
+      const { scheme, authority, path } = node;
+      if (scheme) visitor.visitScheme(visitor, scheme);
+      if (authority) visitor.visitAuthority(visitor, authority);
+      if (path) visitor.visitPath(visitor, path);
+    });
   },
   visitTail(visitor, node) {
-    for (const rule of node) {
-      visitor.visitTailRule(visitor, rule);
-    }
+    visitStatementBase(visitor, node, () => {
+      visitor.visitToken(visitor, node.openParens);
+      for (const rule of node.rules) {
+        visitor.visitTailRule(visitor, rule);
+      }
+      visitor.visitToken(visitor, node.closeParens);
+    });
   },
   visitScheme(visitor, node) {
     visitor.visitToken(visitor, node);
@@ -73,7 +80,7 @@ export const visitor: Visitor = {
     visitor.visitToken(visitor, node);
   },
   visitPath(visitor, node) {
-    for (const pathFragment of node) {
+    for (const pathFragment of node.fragments) {
       visitor.visitPathFragment(visitor, pathFragment);
     }
   },
@@ -85,15 +92,12 @@ export const visitor: Visitor = {
     }
   },
   visitStaticPathFragment(visitor, node) {
-    visitor.visitToken(visitor, node.name);
+    visitor.visitToken(visitor, node);
   },
   visitParamPathFragment(visitor, node) {
-    visitor.visitToken(visitor, node.name);
+    visitor.visitToken(visitor, node);
   },
   visitTailRule(visitor, node) {
-    const { comment, tailType } = node;
-    if (comment) visitor.visitComment(visitor, comment);
-    visitor.visitTailType(visitor, tailType);
     if (isTailRuleMatch(node)) visitor.visitTailRuleMatch(visitor, node);
     if (isTailRuleForm(node)) visitor.visitTailRuleForm(visitor, node);
     function isTailRuleMatch(node: ast.TailRule): node is ast.TailRuleMatch {
@@ -104,45 +108,75 @@ export const visitor: Visitor = {
     }
   },
   visitTailRuleMatch(visitor, node) {
-    const { matchType, pattern } = node;
-    visitor.visitMatchType(visitor, matchType);
-    for (const value of pattern) {
-      visitor.visitTailRulePatternValue(visitor, value);
-    }
+    visitStatementBase(visitor, node, () => {
+      const { tailType, matchType, pattern } = node;
+      visitor.visitTailType(visitor, tailType);
+      visitor.visitMatchType(visitor, matchType);
+      for (const value of pattern) {
+        visitor.visitTailRulePatternValue(visitor, value);
+      }
+    });
   },
   visitTailRulePatternValue(visitor, node) {
-    visitor.visitToken(visitor, node.value);
+    visitStatementBase(visitor, node, () => {
+      visitor.visitToken(visitor, node);
+    });
   },
   visitTailRuleForm(visitor, node) {
-    const { matchType, pattern } = node;
-    visitor.visitMatchType(visitor, matchType);
-    for (const rule of pattern) {
-      visitor.visitTailRuleFormPatternRule(visitor, rule);
-    }
+    visitStatementBase(visitor, node, () => {
+      const { tailType, matchType, pattern } = node;
+      visitor.visitTailType(visitor, tailType);
+      visitor.visitMatchType(visitor, matchType);
+      for (const rule of pattern) {
+        visitor.visitTailRuleFormPatternRule(visitor, rule);
+      }
+    });
   },
   visitTailRuleFormPatternRule(visitor, node) {
-    const { comment, key, value, array } = node;
-    if (comment) visitor.visitComment(visitor, comment);
-    visitor.visitKey(visitor, key);
-    visitor.visitArrayToken(visitor, array);
-    if (value) {
-      for (const patternValue of value) {
-        visitor.visitTailRulePatternValue(visitor, patternValue);
+    visitStatementBase(visitor, node, () => {
+      const { key, value, array } = node;
+      visitor.visitKey(visitor, key);
+      if (array) visitor.visitArrayToken(visitor, array);
+      if (value) {
+        for (const patternValue of value) {
+          visitor.visitTailRulePatternValue(visitor, patternValue);
+        }
       }
-    }
+    });
   },
   visitKey(visitor, node) {
-    visitor.visitToken(visitor, node.value);
+    visitor.visitToken(visitor, node);
   },
-  visitArrayToken() {},
+  visitArrayToken(visitor, node) {
+    visitor.visitToken(visitor, node);
+  },
   visitTailType(visitor, node) {
     visitor.visitToken(visitor, node);
   },
   visitMatchType(visitor, node) {
     visitor.visitToken(visitor, node);
   },
+  visitCommentGroup(visitor, node) {
+    for (const comment of node.comments) {
+      visitor.visitComment(visitor, comment);
+    }
+  },
   visitComment(visitor, node) {
     visitor.visitToken(visitor, node);
   },
   visitToken() {},
 };
+
+export function visitStatementBase<T extends ast.StatementBase>(
+  visitor: Visitor,
+  node: T,
+  visit: () => void,
+): void {
+  for (const commentGroup of node.leadingComments) {
+    visitor.visitCommentGroup(visitor, commentGroup);
+  }
+  visit();
+  for (const commentGroup of node.trailingComments) {
+    visitor.visitCommentGroup(visitor, commentGroup);
+  }
+}

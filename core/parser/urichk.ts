@@ -3,7 +3,6 @@ import {
   Pattern,
   RecursiveDescentParser,
   Span,
-  SyntaxError,
   Token,
 } from "https://deno.land/x/pbkit@v0.0.39/core/parser/recursive-descent-parser.ts";
 import * as ast from "../ast/index.ts";
@@ -15,39 +14,45 @@ export interface ParseResult<T = ast.Urichk> {
 
 export function parse(text: string): ParseResult {
   const parser = createRecursiveDescentParser(text);
-  const rules = acceptRules(parser);
+  const rules = acceptStatements(parser, [acceptRule]);
   return { ast: rules, parser };
 }
 
-function acceptRules(
+interface AcceptStatementFn<T extends ast.StatementBase> {
+  (
+    parser: RecursiveDescentParser,
+    leadingComments: ast.CommentGroup[],
+  ): T | undefined;
+}
+function acceptStatement<T extends ast.StatementBase>(
   parser: RecursiveDescentParser,
+  acceptStatementFn: AcceptStatementFn<T>,
 ) {
-  const statements: ast.Rule[] = [];
+  const { commentGroups: leadingComments } = skipWsAndSweepComments(parser);
+  const statement = acceptStatementFn(
+    parser,
+    leadingComments,
+  );
+  return statement;
+}
+
+function acceptStatements<T extends ast.StatementBase>(
+  parser: RecursiveDescentParser,
+  acceptStatementFns: AcceptStatementFn<T>[],
+) {
+  const statements: T[] = [];
   statements:
   while (true) {
-    const { commentGroups, trailingNewline } = skipWsAndSweepComments(parser);
-    let leadingComments: ast.CommentGroup[];
-    let leadingDetachedComments: ast.CommentGroup[];
-    if (trailingNewline) {
-      leadingComments = [];
-      leadingDetachedComments = commentGroups;
-    } else {
-      if (commentGroups.length < 1) {
-        leadingComments = [];
-        leadingDetachedComments = [];
-      } else {
-        leadingComments = [commentGroups.pop()!];
-        leadingDetachedComments = commentGroups;
+    const { commentGroups: leadingComments } = skipWsAndSweepComments(parser);
+    for (const acceptStatementFn of acceptStatementFns) {
+      const statement = acceptStatementFn(
+        parser,
+        leadingComments,
+      );
+      if (statement) {
+        statements.push(statement);
+        continue statements;
       }
-    }
-    const statement = acceptRule(
-      parser,
-      leadingComments,
-      leadingDetachedComments,
-    );
-    if (statement) {
-      statements.push(statement);
-      continue statements;
     }
     break;
   }
@@ -57,12 +62,11 @@ function acceptRules(
 function acceptRule(
   parser: RecursiveDescentParser,
   leadingComments: ast.CommentGroup[],
-  leadingDetachedComments: ast.CommentGroup[],
 ): ast.Rule | undefined {
-  const head = acceptHead(parser);
+  const head = acceptStatement(parser, acceptHead);
   if (!head) return;
   skipWsAndComments(parser);
-  const tail = acceptTail(parser);
+  const tail = acceptStatement(parser, acceptTail);
   if (!tail) return;
   const trailingComments = acceptTrailingComments(parser);
   return {
@@ -70,27 +74,58 @@ function acceptRule(
       head,
       tail,
       leadingComments,
-      leadingDetachedComments,
+
       trailingComments,
     ]),
     head,
     tail,
     leadingComments,
-    leadingDetachedComments,
+
     trailingComments,
   };
 }
 
 // @TODO: https://datatracker.ietf.org/doc/html/rfc3986#section-3
-function acceptHead(parser: RecursiveDescentParser): ast.Head | undefined {
+function acceptHead(
+  parser: RecursiveDescentParser,
+  leadingComments: ast.CommentGroup[],
+): ast.Head | undefined {
   const schemeOrAuthority = acceptSchemeOrAuthority(parser);
-  if (!schemeOrAuthority) return;
-  const { scheme, authority } = schemeOrAuthority;
-  const path = acceptPath(parser);
-  return { ...mergeSpans([scheme, authority, path]), scheme, authority, path };
+  if (schemeOrAuthority) {
+    const { scheme, authority } = schemeOrAuthority;
+    const path = acceptPath(parser);
+    const trailingComments = acceptTrailingComments(parser);
+    return {
+      ...mergeSpans([
+        scheme,
+        authority,
+        path,
+        leadingComments,
+      ]),
+      scheme,
+      authority,
+      path,
+      leadingComments,
+      trailingComments,
+    };
+  } else {
+    const path = acceptPath(parser);
+    const trailingComments = acceptTrailingComments(parser);
+    if (!path) return;
+    return {
+      ...mergeSpans([
+        path,
+        leadingComments,
+      ]),
+      path,
+      leadingComments,
+      trailingComments,
+    };
+  }
   function acceptSchemeOrAuthority(parser: RecursiveDescentParser) {
     const loc = parser.loc;
     return acceptPatternAndThen(schemePattern, (token) => {
+      if (!token) return;
       const isSchemeExist = parser.accept(":");
       if (!isSchemeExist) parser.loc = loc;
       return isSchemeExist
@@ -116,6 +151,7 @@ function acceptAuthority(
   };
   function acceptUserinfoAndHost(parser: RecursiveDescentParser) {
     return acceptPatternAndThen(identPattern, (token) => {
+      if (!token) return;
       const isUserinfoExist = parser.accept("@");
       return isUserinfoExist
         ? { userinfo: token, host: parser.expect(identPattern) }
@@ -148,24 +184,33 @@ function acceptPathFragment(
   return { type: isParamPathFragment ? "param" : "static", ...path };
 }
 
-function acceptTail(parser: RecursiveDescentParser): ast.Tail | undefined {
+function acceptTail(
+  parser: RecursiveDescentParser,
+  leadingComments: ast.CommentGroup[],
+): ast.Tail | undefined {
   const openParens = parser.expect("{");
-  skipWsAndComments(parser);
   const rules = acceptTailRules(parser);
-  skipWsAndComments(parser);
   const closeParens = parser.expect("}");
+  const trailingComments = acceptTrailingComments(parser);
   return {
-    ...mergeSpans([openParens, closeParens]),
+    ...mergeSpans([
+      openParens,
+      closeParens,
+      leadingComments,
+      trailingComments,
+    ]),
     openParens,
     rules,
     closeParens,
+    leadingComments,
+    trailingComments,
   };
 }
 
 function acceptTailRules(parser: RecursiveDescentParser): ast.TailRule[] {
   const tailRules: ast.TailRule[] = [];
   while (true) {
-    const tailRule = acceptTailRule(parser);
+    const tailRule = acceptStatement(parser, acceptTailRule);
     if (!tailRule) break;
     tailRules.push(tailRule);
     skipWsAndComments(parser);
@@ -175,6 +220,7 @@ function acceptTailRules(parser: RecursiveDescentParser): ast.TailRule[] {
 
 function acceptTailRule(
   parser: RecursiveDescentParser,
+  leadingComments: ast.CommentGroup[],
 ): ast.TailRule | undefined {
   const tailType = parser.accept(/^(\?|#)/) as ast.Token<"?" | "#">;
   if (!tailType) return;
@@ -185,9 +231,9 @@ function acceptTailRule(
   if (!matchType) return;
   skipWsAndComments(parser);
   switch (matchType.text) {
-    case "form":
+    case "form": {
       const openParens = parser.accept("{");
-      skipWsAndComments(parser);
+      // skipWsAndComments(parser);
       const pattern = acceptTailRuleFormPatternRules(parser);
       skipWsAndComments(parser);
       const closeParens = parser.accept("}");
@@ -197,13 +243,19 @@ function acceptTailRule(
         tailType,
         matchType,
         pattern,
+        leadingComments,
+        trailingComments: acceptTrailingComments(parser),
       } as ast.TailRuleForm; // @FIXME: typing!
-    case "match":
+    }
+    case "match": {
       return {
         tailType,
         matchType,
         pattern: acceptTailRuleMatchPatternRules(parser),
+        leadingComments,
+        trailingComments: acceptTrailingComments(parser),
       } as ast.TailRuleMatch;
+    }
   }
 }
 
@@ -211,37 +263,49 @@ function acceptTailRuleFormPatternRules(
   parser: RecursiveDescentParser,
 ): ast.TailRuleFormPatternRule[] {
   const rules: ast.TailRuleFormPatternRule[] = [];
-  while (!parser.try("}")) {
+  while (!parser.try(/^\s*}/)) {
+    const { commentGroups: leadingComments } = skipWsAndSweepComments(parser);
     const key = choice<ast.Token>([acceptIdent, acceptStrLit])(
       parser,
-    ) as ast.Key;
+    ) as ast.Key | undefined;
+    if (!key) break;
     skipWsAndComments(parser);
     const array = parser.accept("[]");
     skipWsAndComments(parser);
     const equal = parser.accept("=");
     if (equal) {
-      const values: ast.TailRulePatternValue[] = [];
-      while (!skipWsAndCommentUntilNewLine(parser)) {
-        values.push(
-          choice([acceptIdent, acceptStrLit, acceptRegex])(
-            parser,
-          ) as ast.TailRulePatternValue,
-        );
-        skipWsAndComments(parser);
-        if (!parser.accept("|")) break;
-        skipWsAndComments(parser);
-      }
+      const values: ast.TailRulePatternValue[] =
+        acceptTailRuleMatchPatternRules(parser);
+      const trailingComments = acceptTrailingComments(parser);
       rules.push({
-        ...mergeSpans([key, ...values]),
+        ...mergeSpans([
+          key,
+          ...values,
+          leadingComments,
+
+          trailingComments,
+        ]),
         key,
         array,
         value: values,
+        leadingComments,
+
+        trailingComments,
       });
     } else {
+      const trailingComments = acceptTrailingComments(parser);
       rules.push({
-        ...mergeSpans([key]),
+        ...mergeSpans([
+          key,
+          leadingComments,
+
+          trailingComments,
+        ]),
         key,
         array,
+        leadingComments,
+
+        trailingComments,
       });
     }
   }
@@ -251,17 +315,23 @@ function acceptTailRuleFormPatternRules(
 function acceptTailRuleMatchPatternRules(
   parser: RecursiveDescentParser,
 ): ast.TailRuleMatchPatternRule[] {
+  let loc = parser.loc;
   const rules: ast.TailRuleMatchPatternRule[] = [];
   parser.accept("|");
   do {
-    skipWsAndComments(parser);
-    rules.push(
-      choice([acceptRegex, acceptIdent, acceptStrLit])(
-        parser,
-      ) as ast.TailRuleMatchPatternRule,
-    );
+    const { commentGroups: leadingComments } = skipWsAndSweepComments(parser);
+    const rule = choice([acceptRegex, acceptIdent, acceptStrLit])(
+      parser,
+    ) as ast.TailRuleMatchPatternRule;
+    rules.push({
+      ...rule,
+      leadingComments,
+      trailingComments: acceptTrailingComments(parser),
+    });
+    loc = parser.loc;
     skipWsAndComments(parser);
   } while (parser.accept("|"));
+  parser.loc = loc;
   return rules;
 }
 
@@ -303,11 +373,10 @@ interface AcceptFn<T> {
 
 function acceptPatternAndThen<T>(
   pattern: Pattern,
-  then: (token: Token) => T,
+  then: (token: Token | undefined) => T,
 ): AcceptFn<T> {
   return function accept(parser) {
     const token = parser.accept(pattern);
-    if (!token) return;
     return then(token);
   };
 }
@@ -335,6 +404,7 @@ const newlinePattern = /^\r?\n/;
 const identPattern = /^(?:[a-zA-Z0-9\-._~]|%[0-9a-fA-F]{2})+/;
 const strLitPattern = /^'.*?'/;
 const multilineCommentPattern = /^\/\*(?:.|\r?\n)*?\*\//;
+const documentCommentPattern = /^\/\*\*(?:.|\r?\n\s*\*)*(\r?\n\s*)\*\//;
 const singlelineCommentPattern = /^\/\/.*(?:\r?\n|$)/;
 const schemePattern = /^[a-z][a-z0-9\+-\.]*/i;
 const regexPattern =
@@ -358,6 +428,15 @@ function acceptCommentGroup(
   while (true) {
     const whitespace = parser.accept(whitespaceWithoutNewlinePattern);
     if (whitespace) continue;
+    const documentComment = acceptSpecialToken(
+      parser,
+      "document-comment",
+      documentCommentPattern,
+    );
+    if (documentComment) {
+      comments.push(documentComment);
+      continue;
+    }
     const multilineComment = acceptSpecialToken(
       parser,
       "multiline-comment",
@@ -399,6 +478,15 @@ function acceptTrailingComments(
     if (whitespace) continue;
     const newline = parser.accept(newlinePattern);
     if (newline) break;
+    const documentComment = acceptSpecialToken(
+      parser,
+      "document-comment",
+      documentCommentPattern,
+    );
+    if (documentComment) {
+      comments.push(documentComment);
+      continue;
+    }
     const multilineComment = acceptSpecialToken(
       parser,
       "multiline-comment",
@@ -481,34 +569,4 @@ function skipWsAndComments(parser: RecursiveDescentParser): undefined {
     break;
   }
   return;
-}
-
-function skipWsAndCommentUntilNewLine(parser: RecursiveDescentParser): boolean {
-  let hasNewline = false;
-  while (true) {
-    const whitespace = parser.accept(whitespaceWithoutNewlinePattern);
-    if (whitespace) continue;
-    const newline = parser.accept(newlinePattern);
-    if (newline) {
-      hasNewline = true;
-      continue;
-    }
-    const multilineComment = acceptSpecialToken(
-      parser,
-      "multiline-comment",
-      multilineCommentPattern,
-    );
-    if (multilineComment) continue;
-    const singlelineComment = acceptSpecialToken(
-      parser,
-      "singleline-comment",
-      singlelineCommentPattern,
-    );
-    if (singlelineComment) {
-      hasNewline = true;
-      continue;
-    }
-    break;
-  }
-  return hasNewline;
 }

@@ -14,7 +14,6 @@ export type Node =
 export interface StatementBase extends Span {
   leadingComments: CommentGroup[];
   trailingComments: CommentGroup[];
-  leadingDetachedComments: CommentGroup[];
 }
 
 export type Urichk = Rule[];
@@ -25,7 +24,7 @@ export interface Rule extends StatementBase {
   head: Head;
   tail: Tail;
 }
-export interface Head extends Span {
+export interface Head extends StatementBase {
   scheme?: Scheme;
   authority?: Authority;
   path?: Path;
@@ -50,13 +49,13 @@ export interface ParamPathFragment extends Token {
   type: "param";
 }
 
-export interface Tail extends Span {
+export interface Tail extends StatementBase {
   rules: TailRule[];
   openParens: Token;
   closeParens: Token;
 }
 export type TailRule = TailRuleMatch | TailRuleForm;
-export interface TailRuleBase<TMatch extends Token> extends Span {
+export interface TailRuleBase<TMatch extends Token> extends StatementBase {
   tailType: Token<"?" | "#">;
   matchType: TMatch;
 }
@@ -69,7 +68,7 @@ export interface TailRuleForm extends TailRuleBase<Token<"form">> {
   pattern: TailRuleFormPatternRule[];
 }
 export type TailRuleMatchPatternRule = TailRulePatternValue;
-export interface TailRuleFormPatternRule extends Span {
+export interface TailRuleFormPatternRule extends StatementBase {
   key: Key;
   value?: TailRulePatternValue[];
   array?: Token;
@@ -77,6 +76,6 @@ export interface TailRuleFormPatternRule extends Span {
 export interface Key extends Token {
   type: "id" | "string";
 }
-export interface TailRulePatternValue extends Token {
+export interface TailRulePatternValue extends Token, StatementBase {
   type: "id" | "string" | "regex";
 }

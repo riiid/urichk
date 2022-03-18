@@ -6,12 +6,21 @@ await emptyDir("./tmp/npm");
 await build({
   entryPoints: [
     "./index.ts",
-    "./compile/get-path.ts",
-    "./compile/js-url-checker.ts",
-    "./compile/nextjs-navigation-hook.ts",
-    "./compile/nextjs-search-params-hook.ts",
-    "./core/stringifier/formatter.ts",
-    "./core/parser/urichk.ts",
+    { name: "./compile/get-path", path: "./compile/get-path.ts" },
+    { name: "./compile/js-url-checker", path: "./compile/js-url-checker.ts" },
+    {
+      name: "./compile/nextjs-navigation-hook",
+      path: "./compile/nextjs-navigation-hook.ts",
+    },
+    {
+      name: "./compile/nextjs-search-params-hook",
+      path: "./compile/nextjs-search-params-hook.ts",
+    },
+    {
+      name: "./core/stringifier/formatter",
+      path: "./core/stringifier/formatter.ts",
+    },
+    { name: "./core/parser/urichk", path: "./core/parser/urichk.ts" },
   ],
   outDir: "./tmp/npm",
   shims: {

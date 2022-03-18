@@ -135,9 +135,9 @@ export default function format(ast: ast.Urichk): string {
     visitComment(visitor, node) {
       if (node.type === "document-comment") {
         node.text.split("\n").map((line, index) => {
-          const trimed = line.trimStart();
+          const trimed = line.trim();
           if (index) {
-            printer.println("");
+            printer.print("\n");
             printer.printIndent();
             printer.print(" ");
           }

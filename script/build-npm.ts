@@ -11,6 +11,7 @@ await build({
     "./compile/nextjs-navigation-hook.ts",
     "./compile/nextjs-search-params-hook.ts",
     "./core/stringifier/formatter.ts",
+    "./core/parser/urichk.ts",
   ],
   outDir: "./tmp/npm",
   shims: {

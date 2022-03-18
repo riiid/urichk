@@ -10,7 +10,7 @@ await build({
     "./compile/js-url-checker.ts",
     "./compile/nextjs-navigation-hook.ts",
     "./compile/nextjs-search-params-hook.ts",
-    "./stringifier/formatter.ts",
+    "./core/stringifier/formatter.ts",
   ],
   outDir: "./tmp/npm",
   shims: {

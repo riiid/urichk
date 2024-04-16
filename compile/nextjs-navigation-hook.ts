@@ -22,7 +22,7 @@ export function compile(
   return `
     import {useCallback} from 'react';
     import {useRouter} from 'next/router';
-    import {encode} from 'querystring';
+
     export interface NavigateConfig {
       replace: boolean; // true: replace, false: push
       shallow: boolean;
@@ -46,7 +46,7 @@ export function compile(
         const navigateFn = replace ? router.replace : router.push;
         const query = (
           searchParams ?
-          '?' + encode(searchParams) :
+          '?' + encodeURI(Object.entries(searchParams).map(([key, value]) => \`\${key}=\${value}\`).join('&')) :
           ''
         );
         navigateFn(path + query, undefined, { shallow });

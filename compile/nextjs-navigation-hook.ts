@@ -46,7 +46,7 @@ export function compile(
         const navigateFn = replace ? router.replace : router.push;
         const query = (
           searchParams ?
-          '?' + encodeURI(Object.entries(searchParams).map(([key, value]) => \`\${key}=\${value}\`).join('&')) :
+          '?' + encodeURI(Object.entries(searchParams).map(([key, value]) => \`\${key}=\${value ?? ''}\`).join('&')) :
           ''
         );
         navigateFn(path + query, undefined, { shallow });

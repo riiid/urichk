@@ -33,7 +33,7 @@ export interface PathParamsTable {${
 export default function ${defaultFunctionName}<Path extends keyof PathParamsTable>(path: Path, searchParams?: PathParamsTable[Path]): string {
   const query = (
       searchParams ?
-      '?' + encodeURI(Object.entries(searchParams).map(([key, value]) => \`\${key}=\${value}\`).join('&')) :
+      '?' + encodeURI(Object.entries(searchParams).map(([key, value]) => \`\${key}=\${value ?? ''}\`).join('&')) :
       ''
     );
   return path + query;
